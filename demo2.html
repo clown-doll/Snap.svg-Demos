@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Snap.svg Demos - SVG Percent</title>
+	<style>
+	body{
+		background-color: #efefef;
+	}
+	.container{
+		width: 400px;
+		height: 200px;
+		position: relative;
+		margin: auto;
+		font-family: 'Share Tech', sans-serif;
+		color: #444;
+	}
+	#percent, #svg {
+	  width: 200px;
+	  height: 200px;
+	  position: absolute;
+	  top: 0;
+	  left: 0;
+	}
+	#percent {
+	  line-height: 20px;
+	  height: 20px;
+	  width 100%;
+	  top: 90px;
+	  font-size: 43px;
+	  text-align: center;
+	  color: #3da08d;
+	  opacity: 0.8
+	}
+	p, .btn {
+	  position: relative;
+	  left: 220px;
+	  width: 200px;
+	  display: block;
+	  text-transform: uppercase;
+	  font-size: 24px;
+	  top: 30px;
+	}
+	.btn {
+	  text-align: center;
+	  background: #5fc2af;
+	  color: #fff;
+	  width: 120px;
+	  height: 37px;
+	  line-height: 37px;
+	  cursor: pointer;
+	}
+	input {
+	  border: 0;
+	  outline: 0;
+	  border-bottom: 1px solid #eee;
+	  width: 30px;
+	  font-family: helvetica;
+	  font-size: 24px;
+	  text-transform: capitalise;
+	  font-family: 'Share Tech', sans-serif;
+	  background: transparent;
+	}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div id="percent"></div>
+		<svg id="svg"></svg>
+		<p><label for="perc-input">Percent:</label><input maxlength="2" type="text" id="input" value="95"/></p>
+		<a class="btn" id="run">Run</a>
+	</div>
+	<script src="scripts/snap.svg-min.js"></script>
+	<script>
+	var canvasSize = 200, // svg 宽度
+			centre = canvasSize/2, // 宽度中心位置（也是起始点x坐标）
+			radius = canvasSize*0.8/2, // 圆半径
+			svg = Snap("#svg"), // 获取svg
+			path = ""; // 定义圆弧路径
+			arc = svg.path(path), // 描绘圆弧路径
+			startY = centre-radius, // 起始点y坐标
+			oRunBtn = document.getElementById('run'), // 获取按钮
+    	oPercDiv = document.getElementById('percent'), // 获取百分数据区域
+    	oInput = document.getElementById('input'); // 获取输入框
+
+  // 设置输入框数值
+	oInput.onkeyup = function(evt) {
+    if(isNaN(input.value)) {
+      input.value = '';
+    }
+	};
+
+	// 重新执行动画
+	oRunBtn.onclick = function() {
+  	run(input.value/100);
+	};
+
+
+	/**
+	 * 进度动画
+	 * @param  {number} percent 进度数据
+	 */
+  function run(percent) { 
+
+    var endpoint = percent*360;  //获取最终角度
+    
+    Snap.animate(0, endpoint, function (val) {
+
+      arc.remove(); // 移除圆弧
+
+      var d = val, // 每个节点的角度
+          dr = d-90; // 数学上的角度是从x轴正半轴开始计算的，我们起始是90度，所以要减去90
+          radians = 2*Math.PI*(dr)/360, // 弧度 = 2π * 角度 / 360 ；
+          // 计算终点坐标
+          endx = centre + radius*Math.cos(radians),
+          endy = centre + radius*Math.sin(radians),
+          largeArc = d>180 ? 1 : 0;  
+          path = "M"+centre+","+startY+" A"+radius+","+radius+" 0 "+largeArc+",1 "+endx+","+endy; // 圆弧路径
+
+      arc = svg.path(path); // 绘制圆弧路径
+
+      // 圆弧路径属性设置
+      arc.attr({
+        stroke: '#3da08d',
+        fill: 'none',
+        strokeWidth: 12
+      });
+
+      oPercDiv.innerHTML = Math.round(val/360*100) +'%'; // 百分数值设置
+
+  	}, 2000, mina.easeinout);  
+	}
+
+	run(input.value/100);
+	</script>
+</body>
+</html>
